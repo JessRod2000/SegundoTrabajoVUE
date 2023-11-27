@@ -18,35 +18,96 @@ export default {
             birthDay: ''
           }
         }
-      }
+      },
+      validation: {
+        userNameValid: true,
+        emailValid: true,
+        passwordValid: true,
+        firstNameValid: true,
+        lastNameValid: true,
+        ageValid: true,
+        birthDayValid: true,
+        errorMessages: [],
+      },
+      resetValidation() {
+        // Reset validation status and error messages
+        for (const key in this.validation) {
+          if (typeof this.validation[key] === "boolean") {
+            this.validation[key] = true;
+          } else if (Array.isArray(this.validation[key])) {
+            this.validation[key].length = 0;
+          }
+        }
+      },
     }
   },
   methods:{
     saveUser(){
-      console.log(this.model.user);
-      axios.post('http://localhost:8080/v1/users',this.model.user)
-          .then(res=>{
-            alert('User was saved');
-            this.model.user={
-              userName: '',
-              password:'',
-              email: '',
-              createdAt: '',
-              userDetail: {
-                firstName: '',
-                lastName: '',
-                age: '',
-                birthDay: ''
+      if(this.validateForm()){
+        console.log("Nuevo valor de this.model.user:", JSON.stringify(this.model.user, null, 2));
+        axios.post('http://localhost:8080/v1/users',this.model.user)
+            .then(res=>{
+              alert('User was saved');
+              this.model.user={
+                userName: '',
+                password:'',
+                email: '',
+                createdAt: '',
+                userDetail: {
+                  firstName: '',
+                  lastName: '',
+                  age: '',
+                  birthDay: ''
+                }
               }
-            }
-            console.log(JSON.stringify(this.model.user, null, 2));
-      }).catch(function (error){
-        //error
-      })
-    }
+              this.resetValidation();
+            }).catch(function (error){
+          //error
+        })
+      }else{
+        //alert("Todos los campos son obligatorios")
+      }
+    },
+    validateForm() {
+      const user = this.model.user;
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const textRegex = /^[a-zA-Z]+$/;
+      const numberRegex = /^[0-9]+$/;
+      const alphanumericRegex = /^[a-zA-Z0-9]+$/;
+
+      // Reset validation status and error messages
+      this.resetValidation();
+
+      // Validate each field
+      this.validateField("userName", alphanumericRegex.test(user.userName.trim()),"The userName field only alphanumeric characters are allowed.");
+      this.validateField("email", emailRegex.test(user.email.trim()),"Please use the correct email format");
+      this.validateField("password", user.password.trim() !== "", "The password field cannot be empty");
+      this.validateField("firstName", textRegex.test(user.userDetail.firstName.trim()),"The firstName field only allows alphabetic characters");
+      this.validateField("lastName", textRegex.test(user.userDetail.lastName.trim()),"The lastName field only allows alphabetic characters");
+      this.validateField("age", numberRegex.test(user.userDetail.age),"Invalid age");
+      this.validateField("birthDay", user.userDetail.birthDay.trim() !== "","The birthDay field cannot be empty");
+
+      // Return true if all fields are valid, false otherwise
+      return !this.validation.errorMessages.length;
+    },
+    validateField(fieldName, isValid,message) {
+      // Set validation status for the field
+      this.validation[fieldName + "Valid"] = isValid;
+
+      // Add error message if the field is invalid
+      if (!isValid) {
+        this.validation.errorMessages.push(message);
+      }
+    },
   }
 }
 </script>
+<style>
+.error-message {
+  color: red;
+  font-size: 12px;
+}
+</style>
 
 <template>
   <div class="container mt-5">
@@ -58,30 +119,51 @@ export default {
         <div class="mb-3">
           <label for="">UserName</label>
           <input type="text" v-model="model.user.userName" class="form-control">
+          <span v-if="!validation.userNameValid" class="error-message">
+            {{ validation.errorMessages.find(message => message.includes('userName')) }}
+          </span>
         </div>
         <div class="mb-3">
           <label for="">Email</label>
           <input type="email" v-model="model.user.email" class="form-control">
+          <span v-if="!validation.emailValid" class="error-message">
+            {{ validation.errorMessages.find(message => message.includes('email')) }}
+          </span>
         </div>
         <div class="mb-3">
           <label for="">Password</label>
           <input type="password" v-model="model.user.password" class="form-control" >
+          <span v-if="!validation.passwordValid" class="error-message">
+            {{ validation.errorMessages.find(message => message.includes('password')) }}
+          </span>
         </div>
         <div class="mb-3">
           <label for="">First Name</label>
           <input type="text" v-model="model.user.userDetail.firstName" class="form-control" >
+          <span v-if="!validation.firstNameValid" class="error-message">
+            {{ validation.errorMessages.find(message => message.includes('firstName')) }}
+          </span>
         </div>
         <div class="mb-3">
           <label for="">Last Name</label>
           <input type="text" v-model="model.user.userDetail.lastName" class="form-control" >
+          <span v-if="!validation.lastNameValid" class="error-message">
+            {{ validation.errorMessages.find(message => message.includes('lastName')) }}
+          </span>
         </div>
         <div class="mb-3">
           <label for="">Age</label>
           <input type="number" v-model="model.user.userDetail.age" class="form-control">
+          <span v-if="!validation.ageValid" class="error-message">
+            {{ validation.errorMessages.find(message => message.includes('age')) }}
+          </span>
         </div>
         <div class="mb-3">
           <label for="">Birthday</label>
           <input type="date" v-model="model.user.userDetail.birthDay" class="form-control" >
+          <span v-if="!validation.birthDayValid" class="error-message">
+            {{ validation.errorMessages.find(message => message.includes('birthDay')) }}
+          </span>
         </div>
 
         <div class="d-flex justify-content-center mb-4">
@@ -96,7 +178,3 @@ export default {
     </div>
   </div>
 </template>
-
-<style scoped>
-
-</style>

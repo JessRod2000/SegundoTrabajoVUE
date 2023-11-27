@@ -25,6 +25,11 @@ export default {
           //error
         })
       }
+    },
+    formatDate(dateString) {
+      const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+      const date = new Date(dateString);
+      return date.toLocaleDateString(undefined, options);
     }
   },
   mounted(){
@@ -34,6 +39,8 @@ export default {
 </script>
 
 <template>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Playfair+Display:400,700&display=swap" />
+
   <h1 class="d-flex justify-content-between align-items-center">
     <span>List User</span>
     <RouterLink to="/users/create" class="btn btn-primary">
@@ -62,11 +69,11 @@ export default {
       <td>{{ user.lastName }}</td>
       <td>{{ user.email }}</td>
       <td>{{ user.age }}</td>
-      <td>{{ user.birthDay }}</td>
+      <td>{{ formatDate(user.birthDay) }}</td>
       <td>
         <RouterLink :to="{ path: '/users/' + user.id + '/edit' }" class="btn btn-success">
           Edit
-        </RouterLink>
+        </RouterLink>&nbsp;
         <button type="button" @click="deleteById(user.id)" class="btn btn-danger">
           Delete
         </button>
@@ -75,7 +82,3 @@ export default {
     </tbody>
   </table>
 </template>
-
-<style scoped>
-
-</style>
