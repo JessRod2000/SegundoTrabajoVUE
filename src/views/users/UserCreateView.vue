@@ -39,6 +39,7 @@ export default {
                 birthDay: ''
               }
             }
+            console.log(JSON.stringify(this.model.user, null, 2));
       }).catch(function (error){
         //error
       })
@@ -60,27 +61,27 @@ export default {
         </div>
         <div class="mb-3">
           <label for="">Email</label>
-          <input type="text" v-model="model.user.email" class="form-control">
+          <input type="email" v-model="model.user.email" class="form-control">
         </div>
         <div class="mb-3">
           <label for="">Password</label>
-          <input type="text" v-model="model.user.password" class="form-control">
+          <input type="password" v-model="model.user.password" class="form-control" >
         </div>
         <div class="mb-3">
           <label for="">First Name</label>
-          <input type="text" v-model="model.user.userDetail.firstName" class="form-control">
+          <input type="text" v-model="model.user.userDetail.firstName" class="form-control" >
         </div>
         <div class="mb-3">
           <label for="">Last Name</label>
-          <input type="text" v-model="model.user.userDetail.lastName" class="form-control">
+          <input type="text" v-model="model.user.userDetail.lastName" class="form-control" >
         </div>
         <div class="mb-3">
           <label for="">Age</label>
-          <input type="text" v-model="model.user.userDetail.age" class="form-control">
+          <input type="number" v-model="model.user.userDetail.age" class="form-control">
         </div>
         <div class="mb-3">
           <label for="">Birthday</label>
-          <input type="date" v-model="model.user.userDetail.birthDay" class="form-control">
+          <input type="date" v-model="model.user.userDetail.birthDay" class="form-control" >
         </div>
 
         <div class="d-flex justify-content-center mb-4">
